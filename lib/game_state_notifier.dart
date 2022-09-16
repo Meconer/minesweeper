@@ -22,7 +22,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     }
     if (state.isFlagging) {
       board.flagCell(index);
-      bool won = board.areAllCellsMarked();
+      bool won = board.hasWon();
       final newState =
           state.copyWith(board: board, isWon: won, hasPlacedMines: true);
       state = newState;
@@ -33,7 +33,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
         board.gameOver();
         state = state.copyWith(board: board);
       } else {
-        bool won = board.areAllCellsMarked();
+        bool won = board.hasWon();
         final newState =
             state.copyWith(board: board, isWon: won, hasPlacedMines: true);
         state = newState;
@@ -46,7 +46,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     final board = state.board.copy();
 
     board.flagCell(index);
-    bool won = board.areAllCellsMarked();
+    bool won = board.hasWon();
     final newState = state.copyWith(board: board, isWon: won);
     state = newState;
   }

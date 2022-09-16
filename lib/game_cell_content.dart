@@ -16,6 +16,7 @@ class GameCellContent {
 
   void digCell() {
     logger.d('digCell ${gameCellType.name}');
+    isFlagged = false;
     if (gameCellType == GameCellType.hiddenMine) {
       gameCellType = GameCellType.explodedMine;
     } else if (noOfNeighbourMines > 0) {

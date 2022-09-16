@@ -176,6 +176,26 @@ class Board {
     }
     return true;
   }
+
+  bool hasWon() {
+    // Check all cells
+    for (final cell in cells) {
+      // Check if we have flagged a cell without a mine
+      if (cell.gameCellContent.isFlagged) {
+        if (cell.gameCellContent.gameCellType != GameCellType.hiddenMine) {
+          return false;
+        }
+      } else {
+        // Check if cell is not digged
+        if (cell.gameCellContent.gameCellType == GameCellType.hidden ||
+            cell.gameCellContent.gameCellType == GameCellType.hiddenMine) {
+          return false;
+        }
+      }
+    }
+    // All cells are either flagged correctly or digged. Then we have won
+    return true;
+  }
 }
 
 class GameCell {
