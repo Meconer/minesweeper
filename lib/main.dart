@@ -21,6 +21,7 @@ class MyApp extends ConsumerWidget {
     final gameStateNotifier = ref.watch(gameStateNotifierProvider.notifier);
     final gameState = ref.watch(gameStateNotifierProvider);
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(
@@ -37,7 +38,12 @@ class MyApp extends ConsumerWidget {
                   child: GameGrid(),
                 ),
               ),
-              const WinWidget(),
+              Container(
+                color: Colors.grey[300],
+                width: double.infinity,
+                alignment: Alignment.center,
+                child: const WinWidget(),
+              ),
               Expanded(
                 child: Container(
                   color: Colors.grey[300],
@@ -77,12 +83,24 @@ class WinWidget extends ConsumerWidget {
     if (gameState.isWon) {
       return const Text(
         'WIN!',
-        style: TextStyle(backgroundColor: Colors.transparent, fontSize: 36),
+        style: TextStyle(
+          color: Colors.green,
+          fontSize: 36,
+        ),
+      );
+    } else if (gameState.isGameOver) {
+      return const Text(
+        'BOOM!',
+        style: TextStyle(
+            color: Colors.red, fontWeight: FontWeight.bold, fontSize: 36),
       );
     } else {
       return const Text(
         'Playing',
-        style: TextStyle(backgroundColor: Colors.transparent, fontSize: 36),
+        style: TextStyle(
+          backgroundColor: Colors.transparent,
+          fontSize: 36,
+        ),
       );
     }
   }

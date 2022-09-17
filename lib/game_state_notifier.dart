@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
-import 'package:minesweeper/main.dart';
 
 import 'board.dart';
 import 'game_state.dart';
@@ -13,31 +12,24 @@ class GameStateNotifier extends StateNotifier<GameState> {
   void tapCell(int index) {
     logger.d('tapCell called $index');
     var board = state.board.copy();
-    if (!state.hasPlacedMines) {
-      List<int> mines =
-          board.getRandomMineList(boardWidth * boardWidth, noOfMines, index);
-      board = board.copyWith(mines: mines);
-      board.setHiddenMines();
-      board.setNeighbourCounts();
-    }
-    if (state.isFlagging) {
-      board.flagCell(index);
-      bool won = board.hasWon();
-      final newState =
-          state.copyWith(board: board, isWon: won, hasPlacedMines: true);
+    final dugUpAMine = board.tapCell(index, state.isFlagging);
+    if (dugUpAMine) {
+      board.gameOver();
+      final newState = state.copyWith(
+        board: board,
+        isFlagging: false,
+        isGameOver: true,
+        isWon: false,
+      );
       state = newState;
     } else {
-      board.digCell(index);
-      if (board.mines.contains(index)) {
-        // Mine! Game is over
-        board.gameOver();
-        state = state.copyWith(board: board);
-      } else {
-        bool won = board.hasWon();
-        final newState =
-            state.copyWith(board: board, isWon: won, hasPlacedMines: true);
-        state = newState;
-      }
+      final newState = state.copyWith(
+        board: board,
+        isFlagging: state.isFlagging,
+        isGameOver: false,
+        isWon: board.hasWon(),
+      );
+      state = newState;
     }
   }
 
@@ -64,11 +56,11 @@ class GameStateNotifier extends StateNotifier<GameState> {
     logger.i(line);
 
     state = GameState(
-        board: state.board,
-        isFlagging: false,
-        isGameOver: true,
-        isWon: false,
-        hasPlacedMines: false);
+      board: state.board,
+      isFlagging: false,
+      isGameOver: true,
+      isWon: false,
+    );
   }
 
   void initGameBoard({required int boardWidth, required int noOfMines}) {
@@ -77,7 +69,6 @@ class GameStateNotifier extends StateNotifier<GameState> {
       isFlagging: false,
       isGameOver: false,
       isWon: false,
-      hasPlacedMines: false,
     );
   }
 }
@@ -90,6 +81,5 @@ final gameStateNotifierProvider =
                 isFlagging: false,
                 isGameOver: false,
                 isWon: false,
-                hasPlacedMines: false,
               ),
             ));

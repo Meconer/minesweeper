@@ -4,9 +4,10 @@ import 'game_cell_content.dart';
 
 class Board {
   final int boardWidth;
+  final int noOfMines = 10;
   late final List<GameCell> cells;
-  late final List<int> mines;
-  Logger logger = Logger(level: Level.error);
+  List<int> mines = [];
+  Logger logger = Logger(level: Level.debug);
 
   Board({
     required this.boardWidth,
@@ -118,7 +119,30 @@ class Board {
     return mines;
   }
 
-  void digCell(int index) {
+  bool tapCell(int index, bool isFlagging) {
+    logger.d('tapCell called $index');
+    placeMinesIfNotDone(index);
+    if (isFlagging) {
+      flagCell(index);
+      return false;
+    } else {
+      bool hitMine = digCell(index);
+      return hitMine;
+    }
+  }
+
+  void placeMinesIfNotDone(int index) {
+    if (mines.isEmpty) {
+      // No mines. Place new mines but avoid this cell and all neighbours
+      mines = getRandomMineList(boardWidth * boardWidth, noOfMines, index);
+      // Set the cellcontent of the mines
+      setHiddenMines();
+      // and calculate the cells neighbour mine count
+      setNeighbourCounts();
+    }
+  }
+
+  bool digCell(int index) {
     if (!cells[index].gameCellContent.isDown()) {
       cells[index].gameCellContent.digCell();
       if (cells[index].gameCellContent.gameCellType == GameCellType.empty) {
@@ -128,7 +152,9 @@ class Board {
           digCell(neighbour);
         }
       }
+      return mines.contains(index);
     }
+    return false;
   }
 
   void flagCell(int index) {
@@ -187,8 +213,7 @@ class Board {
         }
       } else {
         // Check if cell is not digged
-        if (cell.gameCellContent.gameCellType == GameCellType.hidden ||
-            cell.gameCellContent.gameCellType == GameCellType.hiddenMine) {
+        if (!cell.gameCellContent.isDown()) {
           return false;
         }
       }
