@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -14,6 +15,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
     var board = state.board.copy();
     final dugUpAMine = board.tapCell(index, state.isFlagging);
     if (dugUpAMine) {
+      vibrate();
       board.gameOver();
       final newState = state.copyWith(
         board: board,
@@ -29,6 +31,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
         isGameOver: false,
         isWon: board.hasWon(),
       );
+      if (newState.isWon) vibrate();
       state = newState;
     }
   }
@@ -39,6 +42,7 @@ class GameStateNotifier extends StateNotifier<GameState> {
 
     board.flagCell(index);
     bool won = board.hasWon();
+    if (won) vibrate();
     final newState = state.copyWith(board: board, isWon: won);
     state = newState;
   }
@@ -70,6 +74,14 @@ class GameStateNotifier extends StateNotifier<GameState> {
       isGameOver: false,
       isWon: false,
     );
+  }
+
+  Future<void> vibrate() async {
+    HapticFeedback.vibrate();
+    await Future.delayed(const Duration(milliseconds: 300));
+    HapticFeedback.vibrate();
+    await Future.delayed(const Duration(milliseconds: 300));
+    HapticFeedback.vibrate();
   }
 }
 

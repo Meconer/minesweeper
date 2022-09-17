@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -24,10 +25,12 @@ class GridButton extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         logger.d('Cell $index tapped');
+        HapticFeedback.selectionClick();
         gameStateNotifier.tapCell(index);
       },
       onLongPress: (() {
-        logger.d('Cell $index longpresed');
+        logger.d('Cell $index longpressed');
+        HapticFeedback.vibrate();
         gameStateNotifier.longPressCell(index);
       }),
       child: Padding(
@@ -78,7 +81,33 @@ class GridButton extends ConsumerWidget {
         return const Image(image: AssetImage('assets/images/bomb_03.png'));
 
       case GameCellType.mineNeighbour:
-        return Text('${cellContent.noOfNeighbourMines}');
+        return Text(
+          '${cellContent.noOfNeighbourMines}',
+          style: TextStyle(
+            color: getNumberColor(cellContent.noOfNeighbourMines),
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+          ),
+        );
+    }
+  }
+
+  Color getNumberColor(int noOfNeighbourMines) {
+    switch (noOfNeighbourMines) {
+      case 1:
+        return Colors.blue;
+      case 2:
+        return Colors.green;
+      case 3:
+        return Colors.red;
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+        return Colors.brown;
+      default:
+        return Colors.black;
     }
   }
 }
