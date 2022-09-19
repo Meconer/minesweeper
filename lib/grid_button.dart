@@ -34,12 +34,12 @@ class GridButton extends ConsumerWidget {
         gameStateNotifier.longPressCell(index);
       }),
       child: Padding(
-        padding: const EdgeInsets.all(3.0),
+        padding: const EdgeInsets.all(1.50),
         child: Container(
           decoration: getDecoration(cellContent),
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.all(3.0),
+              padding: const EdgeInsets.all(1.5),
               child: getCellArt(cellContent, index),
             ),
           ),
@@ -49,8 +49,8 @@ class GridButton extends ConsumerWidget {
   }
 
   BoxDecoration getDecoration(GameCellContent cellContent) {
-    const blur = 2.0;
-    const ofsDist = 2.0;
+    const blur = 1.0;
+    const ofsDist = 1.0;
     const offset = Offset(ofsDist, ofsDist);
     return cellContent.isDown()
         ? BoxDecoration(

@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:minesweeper/game_settings.dart';
 
 import 'board.dart';
 import 'game_state.dart';
@@ -64,15 +65,17 @@ class GameStateNotifier extends StateNotifier<GameState> {
       isFlagging: false,
       isGameOver: true,
       isWon: false,
+      settings: GameSettings.easy(),
     );
   }
 
-  void initGameBoard({required int boardWidth, required int noOfMines}) {
+  void initGameBoard({required GameSettings gameSettings}) {
     state = GameState(
-      board: Board.init(boardWidth, noOfMines),
+      board: Board.init(gameSettings),
       isFlagging: false,
       isGameOver: false,
       isWon: false,
+      settings: gameSettings,
     );
   }
 
@@ -83,15 +86,21 @@ class GameStateNotifier extends StateNotifier<GameState> {
     await Future.delayed(const Duration(milliseconds: 300));
     HapticFeedback.vibrate();
   }
+
+  void changeSettings(GameSettings? gameSettings) {
+    logger.d(gameSettings!.settingName);
+    state = state.copyWith(settings: gameSettings);
+  }
 }
 
 final gameStateNotifierProvider =
     StateNotifierProvider<GameStateNotifier, GameState>(
         (ref) => GameStateNotifier(
               GameState(
-                board: Board.init(8, 10),
+                board: Board.init(GameSettings.easy()),
                 isFlagging: false,
                 isGameOver: false,
                 isWon: false,
+                settings: GameSettings.easy(),
               ),
             ));

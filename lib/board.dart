@@ -1,40 +1,50 @@
 import 'dart:math';
 import 'package:logger/logger.dart';
+import 'package:minesweeper/game_settings.dart';
 import 'game_cell_content.dart';
 
 class Board {
   final int boardWidth;
-  final int noOfMines = 10;
+  final int noOfMines;
   late final List<GameCell> cells;
   List<int> mines = [];
-  Logger logger = Logger(level: Level.debug);
 
-  Board({
-    required this.boardWidth,
-    required this.cells,
-    required this.mines,
-  }) {
+  Logger logger = Logger(level: Level.error);
+
+  Board(
+      {required this.boardWidth,
+      required this.cells,
+      required this.mines,
+      required this.noOfMines}) {
     logger.d('Board is created.');
     printBoard();
     printMines();
   }
 
-  Board copyWith({int? boardWidth, List<GameCell>? cells, List<int>? mines}) {
+  Board copyWith({
+    int? boardWidth,
+    List<GameCell>? cells,
+    List<int>? mines,
+    int? noOfMines,
+  }) {
     return Board(
       boardWidth: boardWidth ?? this.boardWidth,
       cells: cells ?? this.cells,
       mines: mines ?? this.mines,
+      noOfMines: noOfMines ?? this.noOfMines,
     );
   }
 
-  factory Board.init(int boardWidth, int noOfMines) {
-    final List<GameCell> cells = List.generate(boardWidth * boardWidth,
+  factory Board.init(GameSettings settings) {
+    final List<GameCell> cells = List.generate(
+        settings.boardWidth * settings.boardWidth,
         (_) => GameCell(gameCellContent: GameCellContent()));
 
     final board = Board(
-      boardWidth: boardWidth,
+      boardWidth: settings.boardWidth,
       cells: cells,
       mines: <int>[],
+      noOfMines: settings.noOfMines,
     );
 
     return board;
@@ -134,7 +144,11 @@ class Board {
   void placeMinesIfNotDone(int index) {
     if (mines.isEmpty) {
       // No mines. Place new mines but avoid this cell and all neighbours
-      mines = getRandomMineList(boardWidth * boardWidth, noOfMines, index);
+      mines = getRandomMineList(
+        boardWidth * boardWidth,
+        noOfMines,
+        index,
+      );
       // Set the cellcontent of the mines
       setHiddenMines();
       // and calculate the cells neighbour mine count
@@ -167,8 +181,11 @@ class Board {
       newCells.add(GameCell(gameCellContent: cell.gameCellContent));
     }
 
-    Board copiedBoard =
-        Board(boardWidth: boardWidth, cells: newCells, mines: mines);
+    Board copiedBoard = Board(
+        boardWidth: boardWidth,
+        cells: newCells,
+        mines: mines,
+        noOfMines: noOfMines);
     return copiedBoard;
   }
 

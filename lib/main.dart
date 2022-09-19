@@ -5,9 +5,7 @@ import 'package:flutter/services.dart';
 import 'game_button.dart';
 import 'game_grid.dart';
 import 'game_state_notifier.dart';
-
-const int boardWidth = 8;
-const int noOfMines = 10;
+import 'settings_page.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -23,53 +21,64 @@ class MyApp extends ConsumerWidget {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
     return MaterialApp(
-      home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Minesweeper'),
-            backgroundColor: Colors.grey[500],
-            foregroundColor: Colors.black87,
-          ),
-          body: Column(
-            children: [
-              Expanded(
-                flex: 3,
-                child: Container(
-                  color: Colors.grey[300],
-                  child: GameGrid(),
-                ),
-              ),
-              Container(
-                color: Colors.grey[300],
-                width: double.infinity,
-                alignment: Alignment.center,
-                child: const WinWidget(),
-              ),
-              Expanded(
-                child: Container(
-                  color: Colors.grey[300],
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      GameButton(
-                        icon: Icons.refresh,
-                        callback: () {
-                          gameStateNotifier.initGameBoard(
-                              boardWidth: boardWidth, noOfMines: noOfMines);
-                        },
-                      ),
-                      GameButton(
-                          icon: gameState.isFlagging
-                              ? Icons.flag_rounded
-                              : Icons.arrow_downward_rounded,
-                          callback: () {
-                            gameStateNotifier.toggleDigOrFlag();
-                          }),
-                    ],
+      routes: {SettingsPage.routeName: ((context) => SettingsPage())},
+      home: Builder(builder: (context) {
+        return Scaffold(
+            appBar: AppBar(
+              title: const Text('Minesweeper'),
+              backgroundColor: Colors.grey[500],
+              foregroundColor: Colors.black87,
+              actions: [
+                IconButton(
+                  onPressed: (() {
+                    Navigator.pushNamed(context, SettingsPage.routeName);
+                  }),
+                  icon: const Icon(Icons.menu_rounded),
+                )
+              ],
+            ),
+            body: Column(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    color: Colors.grey[300],
+                    child: GameGrid(),
                   ),
                 ),
-              )
-            ],
-          )),
+                Container(
+                  color: Colors.grey[300],
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  child: const WinWidget(),
+                ),
+                Expanded(
+                  child: Container(
+                    color: Colors.grey[300],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        GameButton(
+                          icon: Icons.refresh,
+                          callback: () {
+                            gameStateNotifier.initGameBoard(
+                                gameSettings: gameState.settings);
+                          },
+                        ),
+                        GameButton(
+                            icon: gameState.isFlagging
+                                ? Icons.flag_rounded
+                                : Icons.arrow_downward_rounded,
+                            callback: () {
+                              gameStateNotifier.toggleDigOrFlag();
+                            }),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ));
+      }),
     );
   }
 }
