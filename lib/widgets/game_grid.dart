@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
-import 'game_state_notifier.dart';
+import '../controllers/game_controller.dart';
 import 'grid_button.dart';
 
 class GameGrid extends ConsumerWidget {
@@ -11,7 +11,7 @@ class GameGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(gameStateNotifierProvider);
+    final gameState = ref.watch(gameStateProvider);
 
     return Padding(
       padding: const EdgeInsets.all(24.0),

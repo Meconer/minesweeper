@@ -1,13 +1,14 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
-import 'package:minesweeper/game_settings.dart';
+import 'package:minesweeper/models/game_settings.dart';
+import 'package:minesweeper/services/stored_settings.dart';
 
-import 'board.dart';
-import 'game_state.dart';
+import '../models/board.dart';
+import '../models/game_state.dart';
 
-class GameStateNotifier extends StateNotifier<GameState> {
-  GameStateNotifier(super.state);
+class GameController extends StateNotifier<GameState> {
+  GameController(super.state);
   Logger logger = Logger(level: Level.error);
 
   // User tapped a cell
@@ -87,20 +88,24 @@ class GameStateNotifier extends StateNotifier<GameState> {
     HapticFeedback.vibrate();
   }
 
-  void changeSettings(GameSettings? gameSettings) {
+  Future<void> changeSettings(GameSettings? gameSettings) async {
     logger.d(gameSettings!.settingName);
-    state = state.copyWith(settings: gameSettings);
+    await StoredSettings().saveSettings(gameSettings);
+    var board = state.board;
+    if (!board.havePlacedMines()) {
+      board = Board.init(gameSettings);
+    }
+    state = state.copyWith(board: board, settings: gameSettings);
   }
 }
 
-final gameStateNotifierProvider =
-    StateNotifierProvider<GameStateNotifier, GameState>(
-        (ref) => GameStateNotifier(
-              GameState(
-                board: Board.init(GameSettings.easy()),
-                isFlagging: false,
-                isGameOver: false,
-                isWon: false,
-                settings: GameSettings.easy(),
-              ),
-            ));
+final gameStateProvider =
+    StateNotifierProvider<GameController, GameState>((ref) => GameController(
+          GameState(
+            board: Board.init(GameSettings.easy()),
+            isFlagging: false,
+            isGameOver: false,
+            isWon: false,
+            settings: GameSettings.easy(),
+          ),
+        ));

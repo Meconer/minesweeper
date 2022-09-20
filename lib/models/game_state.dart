@@ -1,4 +1,4 @@
-import 'package:minesweeper/game_settings.dart';
+import 'package:minesweeper/models/game_settings.dart';
 
 import 'board.dart';
 

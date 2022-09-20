@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:minesweeper/game_settings.dart';
-import 'package:minesweeper/game_state_notifier.dart';
+import 'package:minesweeper/models/game_settings.dart';
+import 'package:minesweeper/controllers/game_controller.dart';
 
 class SettingsPage extends ConsumerWidget {
   static const routeName = '/settings';
@@ -17,7 +17,7 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var gameSettings = ref.watch(gameStateNotifierProvider).settings;
+    var gameSettings = ref.watch(gameStateProvider).settings;
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: Center(
@@ -26,9 +26,7 @@ class SettingsPage extends ConsumerWidget {
           value: gameSettings.settingName,
           onChanged: (value) {
             gameSettings = GameSettings.byName(value)!;
-            ref
-                .read(gameStateNotifierProvider.notifier)
-                .changeSettings(gameSettings);
+            ref.read(gameStateProvider.notifier).changeSettings(gameSettings);
           },
         ),
       ),

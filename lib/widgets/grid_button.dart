@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
-import 'game_cell_content.dart';
-import 'game_state_notifier.dart';
+import '../models/game_cell_content.dart';
+import '../controllers/game_controller.dart';
 
 class GridButton extends ConsumerWidget {
   final int index;
@@ -17,8 +17,8 @@ class GridButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(gameStateNotifierProvider);
-    final gameStateNotifier = ref.watch(gameStateNotifierProvider.notifier);
+    final gameState = ref.watch(gameStateProvider);
+    final gameStateNotifier = ref.watch(gameStateProvider.notifier);
 
     final cellContent = gameState.board.cells[index].gameCellContent;
 

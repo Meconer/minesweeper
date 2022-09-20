@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:logger/logger.dart';
-import 'package:minesweeper/game_settings.dart';
+import 'package:minesweeper/models/game_settings.dart';
 import 'game_cell_content.dart';
 
 class Board {
@@ -139,6 +139,10 @@ class Board {
       bool hitMine = digCell(index);
       return hitMine;
     }
+  }
+
+  bool havePlacedMines() {
+    return mines.isNotEmpty;
   }
 
   void placeMinesIfNotDone(int index) {
