@@ -15,7 +15,7 @@ class SplashScreenPage extends ConsumerWidget {
         future: appController.initApp(),
         builder: ((context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return const GamePage();
+            return GamePage();
           } else {
             return Image.asset('assets/images/bomb_01.png');
           }

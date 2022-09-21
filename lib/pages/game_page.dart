@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:minesweeper/controllers/game_controller.dart';
+import 'package:minesweeper/services/log_to_file.dart';
 
 import '../widgets/game_button.dart';
 import '../widgets/game_grid.dart';
@@ -9,8 +11,9 @@ import 'settings_page.dart';
 
 class GamePage extends ConsumerWidget {
   static const String routeName = '/gamePage';
+  final logger = Logger(level: Level.debug, output: LogToFile());
 
-  const GamePage({
+  GamePage({
     Key? key,
   }) : super(key: key);
 
@@ -18,6 +21,7 @@ class GamePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final gameController = ref.watch(gameStateProvider.notifier);
     final GameState gameState = ref.watch(gameStateProvider);
+    logger.d('Rebuild');
 
     return Scaffold(
       appBar: AppBar(

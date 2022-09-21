@@ -33,8 +33,10 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_inset_box_shadow: ^1.0.8
+  flutter_launcher_icons: ^0.10.0
   flutter_riverpod: ^1.0.4
   logger: ^1.1.0
+  path_provider: ^2.0.11
   shared_preferences: ^2.0.15
 
 dev_dependencies:
