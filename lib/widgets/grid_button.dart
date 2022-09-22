@@ -20,7 +20,7 @@ class GridButton extends ConsumerWidget {
     final gameState = ref.watch(gameStateProvider);
     final gameStateNotifier = ref.watch(gameStateProvider.notifier);
 
-    final cellContent = gameState.board.cells[index].gameCellContent;
+    final cellContent = gameState.board.cells[index];
 
     return GestureDetector(
       onTap: () {

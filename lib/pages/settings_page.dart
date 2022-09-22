@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:minesweeper/models/game_settings.dart';
 import 'package:minesweeper/controllers/game_controller.dart';
+import 'package:minesweeper/pages/log_file_page.dart';
 import 'package:minesweeper/services/log_to_file.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -23,6 +24,7 @@ class SettingsPage extends ConsumerWidget {
       appBar: AppBar(title: const Text('Settings')),
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             DropdownButton<String>(
               items: dropDownMenuItems,
@@ -34,21 +36,27 @@ class SettingsPage extends ConsumerWidget {
                     .changeSettings(gameSettings);
               },
             ),
-            const SizedBox(
-              height: 30,
+            ElevatedButton(
+              onPressed: () async {
+                await Navigator.of(context).pushNamed(LogFilePage.routeName);
+              },
+              child: const Text('Logfil'),
             ),
             ElevatedButton(
-                onPressed: () async {
-                  final fileContent = await LogToFile().getLogFileContents();
-                  showDialog(
-                      context: context,
-                      builder: ((context) =>
-                          Scaffold(body: Center(child: Text(fileContent)))));
-                },
-                child: const Text('Logfil')),
+              onPressed: () async {
+                await LogToFile().clearLogFile();
+              },
+              child: const Text('Rensa logfil'),
+            ),
+            ElevatedButton(
+              onPressed: () => saveGame(),
+              child: const Text('Save game'),
+            ),
           ],
         ),
       ),
     );
   }
+
+  saveGame() {}
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:minesweeper/controllers/game_controller.dart';
 import 'package:minesweeper/services/log_to_file.dart';
+import 'package:minesweeper/services/my_log_printer.dart';
 
 import '../widgets/game_button.dart';
 import '../widgets/game_grid.dart';
@@ -11,7 +12,11 @@ import 'settings_page.dart';
 
 class GamePage extends ConsumerWidget {
   static const String routeName = '/gamePage';
-  final logger = Logger(level: Level.debug, output: LogToFile());
+  final logger = Logger(
+    level: Level.debug,
+    output: LogToFile(),
+    printer: MyLogPrinter(),
+  );
 
   GamePage({
     Key? key,

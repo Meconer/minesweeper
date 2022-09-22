@@ -6,7 +6,7 @@ import 'game_cell_content.dart';
 class Board {
   final int boardWidth;
   final int noOfMines;
-  late final List<GameCell> cells;
+  late final List<GameCellContent> cells;
   List<int> mines = [];
 
   Logger logger = Logger(level: Level.error);
@@ -23,7 +23,7 @@ class Board {
 
   Board copyWith({
     int? boardWidth,
-    List<GameCell>? cells,
+    List<GameCellContent>? cells,
     List<int>? mines,
     int? noOfMines,
   }) {
@@ -36,9 +36,8 @@ class Board {
   }
 
   factory Board.init(GameSettings settings) {
-    final List<GameCell> cells = List.generate(
-        settings.boardWidth * settings.boardWidth,
-        (_) => GameCell(gameCellContent: GameCellContent()));
+    final List<GameCellContent> cells = List.generate(
+        settings.boardWidth * settings.boardWidth, (_) => GameCellContent());
 
     final board = Board(
       boardWidth: settings.boardWidth,
@@ -54,7 +53,7 @@ class Board {
     for (int row = 0; row < boardWidth; row++) {
       String line = '';
       for (int col = 0; col < boardWidth; col++) {
-        line += cells[row * boardWidth + col].gameCellContent.gameCellType.name;
+        line += cells[row * boardWidth + col].gameCellType.name;
       }
       logger.d(line);
     }
@@ -161,9 +160,9 @@ class Board {
   }
 
   bool digCell(int index) {
-    if (!cells[index].gameCellContent.isDown()) {
-      cells[index].gameCellContent.digCell();
-      if (cells[index].gameCellContent.gameCellType == GameCellType.empty) {
+    if (!cells[index].isDown()) {
+      cells[index].digCell();
+      if (cells[index].gameCellType == GameCellType.empty) {
         // Empty cell so it is safe to tap all neighbours
         final neighbourList = getNeighbourIndexList(index);
         for (int neighbour in neighbourList) {
@@ -176,13 +175,13 @@ class Board {
   }
 
   void flagCell(int index) {
-    cells[index].gameCellContent.flagCell();
+    cells[index].flagCell();
   }
 
   Board copy() {
-    List<GameCell> newCells = [];
+    List<GameCellContent> newCells = [];
     for (var cell in cells) {
-      newCells.add(GameCell(gameCellContent: cell.gameCellContent));
+      newCells.add(cell);
     }
 
     Board copiedBoard = Board(
@@ -196,28 +195,27 @@ class Board {
   void gameOver() {
     logger.d('Game over!');
     for (int cellIndex in mines) {
-      cells[cellIndex].gameCellContent.gameCellType = GameCellType.explodedMine;
+      cells[cellIndex].gameCellType = GameCellType.explodedMine;
     }
   }
 
   void setNeighbourCounts() {
     for (int cellIndex = 0; cellIndex < boardWidth * boardWidth; cellIndex++) {
       if (!mines.contains(cellIndex)) {
-        cells[cellIndex].gameCellContent.noOfNeighbourMines =
-            countNeighbourMines(cellIndex);
+        cells[cellIndex].noOfNeighbourMines = countNeighbourMines(cellIndex);
       }
     }
   }
 
   void setHiddenMines() {
     for (int cellIndex in mines) {
-      cells[cellIndex].gameCellContent.gameCellType = GameCellType.hiddenMine;
+      cells[cellIndex].gameCellType = GameCellType.hiddenMine;
     }
   }
 
   bool areAllCellsMarked() {
     for (final cell in cells) {
-      if (!cell.gameCellContent.isFlagged && !cell.gameCellContent.isDown()) {
+      if (!cell.isFlagged && !cell.isDown()) {
         return false;
       }
     }
@@ -228,13 +226,13 @@ class Board {
     // Check all cells
     for (final cell in cells) {
       // Check if we have flagged a cell without a mine
-      if (cell.gameCellContent.isFlagged) {
-        if (cell.gameCellContent.gameCellType != GameCellType.hiddenMine) {
+      if (cell.isFlagged) {
+        if (cell.gameCellType != GameCellType.hiddenMine) {
           return false;
         }
       } else {
         // Check if cell is not digged
-        if (!cell.gameCellContent.isDown()) {
+        if (!cell.isDown()) {
           return false;
         }
       }
@@ -242,9 +240,4 @@ class Board {
     // All cells are either flagged correctly or digged. Then we have won
     return true;
   }
-}
-
-class GameCell {
-  GameCellContent gameCellContent;
-  GameCell({required this.gameCellContent});
 }

@@ -9,7 +9,7 @@ class AppController {
 
   Future<void> initApp() async {
     GameSettings settings = await StoredSettings().loadSettings();
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 100));
     gameController.changeSettings(settings);
   }
 }

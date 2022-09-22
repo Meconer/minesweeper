@@ -10,8 +10,7 @@ class LogToFile extends LogOutput {
     String path = await getLogFilePath();
     debugPrint(path);
     File logFile = File(path);
-    logFile.open(mode: FileMode.append);
-    final writer = logFile.openWrite();
+    final writer = logFile.openWrite(mode: FileMode.append);
     writer.writeln(DateTime.now().toIso8601String());
     for (final line in event.lines) {
       writer.writeln(line);
@@ -28,9 +27,19 @@ class LogToFile extends LogOutput {
 
   Future<String> getLogFileContents() async {
     final path = await getLogFilePath();
+    try {
+      File logFile = File(path);
+      await logFile.open(mode: FileMode.read);
+      final content = await logFile.readAsString();
+      return content;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future<void> clearLogFile() async {
+    final path = await getLogFilePath();
     File logFile = File(path);
-    logFile.open(mode: FileMode.read);
-    final content = await logFile.readAsString();
-    return content;
+    logFile.delete();
   }
 }
