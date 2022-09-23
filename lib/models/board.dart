@@ -37,7 +37,8 @@ class Board {
 
   factory Board.init(GameSettings settings) {
     final List<GameCellContent> cells = List.generate(
-        settings.boardWidth * settings.boardWidth, (_) => GameCellContent());
+        settings.boardWidth * settings.boardWidth,
+        (_) => GameCellContent.hiddenCell());
 
     final board = Board(
       boardWidth: settings.boardWidth,
@@ -239,5 +240,35 @@ class Board {
     }
     // All cells are either flagged correctly or digged. Then we have won
     return true;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'boardWidth': boardWidth,
+      'noOfMines': noOfMines,
+      'cells': cells.map((e) => e.toJson()).toList(),
+      'mines': mines,
+    };
+  }
+
+  factory Board.fromJson(json) {
+    int boardWidth = json['boardWidth'];
+    int noOfMines = json['noOfMines'];
+    final jsonCellArray = json['cells'];
+    List<GameCellContent> cells = [];
+    for (var jsonCell in jsonCellArray) {
+      cells.add(GameCellContent.fromJson(jsonCell));
+    }
+    List<int> mines = [];
+    for (var mine in json['mines']) {
+      int newMine = mine;
+      mines.add(newMine);
+    }
+    return Board(
+      boardWidth: boardWidth,
+      cells: cells,
+      mines: mines,
+      noOfMines: noOfMines,
+    );
   }
 }

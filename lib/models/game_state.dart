@@ -22,7 +22,6 @@ class GameState {
     bool? isFlagging,
     bool? isGameOver,
     bool? isWon,
-    bool? hasPlacedMines,
     GameSettings? settings,
   }) {
     return GameState(
@@ -32,5 +31,25 @@ class GameState {
       isWon: isWon ?? this.isWon,
       settings: settings ?? this.settings,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'board': board.toJson(),
+      'isFlagging': isFlagging,
+      'isGameOver': isGameOver,
+      'isWon': isWon,
+      'settings': settings.toJson(),
+    };
+  }
+
+  factory GameState.fromJson(Map<String, dynamic> json) {
+    final board = Board.fromJson(json['board']);
+    return GameState(
+        board: board,
+        isFlagging: json['isFlagging'],
+        isGameOver: json['isGameOver'],
+        isWon: json['isWon'],
+        settings: GameSettings.fromJson(json['settings']));
   }
 }

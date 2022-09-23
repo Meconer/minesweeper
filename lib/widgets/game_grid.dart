@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -15,14 +17,28 @@ class GameGrid extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.all(24.0),
-      child: GridView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: gameState.board.boardWidth * gameState.board.boardWidth,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: gameState.board.boardWidth),
-          itemBuilder: (context, index) {
-            return GridButton(index);
-          }),
+      child: LayoutBuilder(builder: (context, constraints) {
+        var width = constraints.maxWidth;
+        var height = constraints.maxHeight;
+        var size = min(width, height);
+
+        return SizedBox(
+          width: size,
+          height: size,
+          child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount:
+                  gameState.board.boardWidth * gameState.board.boardWidth,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: gameState.board.boardWidth,
+                mainAxisExtent: height / gameState.board.boardWidth,
+                childAspectRatio: 1.0,
+              ),
+              itemBuilder: (context, index) {
+                return GridButton(index);
+              }),
+        );
+      }),
     );
   }
 }

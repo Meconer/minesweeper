@@ -97,6 +97,22 @@ class GameController extends StateNotifier<GameState> {
     }
     state = state.copyWith(board: board, settings: gameSettings);
   }
+
+  GameSettings getSettings() {
+    return state.settings;
+  }
+
+  isFlagging() {
+    return state.isFlagging;
+  }
+
+  void loadState(GameState restoredState) {
+    state = restoredState;
+  }
+
+  getCell(int index) {
+    return state.board.cells[index];
+  }
 }
 
 final gameStateProvider =

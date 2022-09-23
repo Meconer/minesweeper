@@ -7,7 +7,6 @@ import 'package:minesweeper/services/my_log_printer.dart';
 
 import '../widgets/game_button.dart';
 import '../widgets/game_grid.dart';
-import '../models/game_state.dart';
 import 'settings_page.dart';
 
 class GamePage extends ConsumerWidget {
@@ -25,10 +24,10 @@ class GamePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameController = ref.watch(gameStateProvider.notifier);
-    final GameState gameState = ref.watch(gameStateProvider);
     logger.d('Rebuild');
 
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
         title: const Text('Minesweeper'),
         backgroundColor: Colors.grey[500],
@@ -67,11 +66,11 @@ class GamePage extends ConsumerWidget {
                     icon: Icons.refresh,
                     callback: () {
                       gameController.initGameBoard(
-                          gameSettings: gameState.settings);
+                          gameSettings: gameController.getSettings());
                     },
                   ),
                   GameButton(
-                      icon: gameState.isFlagging
+                      icon: gameController.isFlagging()
                           ? Icons.flag_rounded
                           : Icons.arrow_downward_rounded,
                       callback: () {

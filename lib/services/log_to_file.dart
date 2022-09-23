@@ -16,7 +16,7 @@ class LogToFile extends LogOutput {
       writer.writeln(line);
     }
     await writer.flush();
-    await writer.done;
+    await writer.close();
   }
 
   Future<String> getLogFilePath() async {
@@ -28,9 +28,7 @@ class LogToFile extends LogOutput {
   Future<String> getLogFileContents() async {
     final path = await getLogFilePath();
     try {
-      File logFile = File(path);
-      await logFile.open(mode: FileMode.read);
-      final content = await logFile.readAsString();
+      final content = await File(path).readAsString();
       return content;
     } catch (e) {
       return e.toString();
@@ -40,6 +38,10 @@ class LogToFile extends LogOutput {
   Future<void> clearLogFile() async {
     final path = await getLogFilePath();
     File logFile = File(path);
-    logFile.delete();
+    try {
+      logFile.delete();
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+    }
   }
 }

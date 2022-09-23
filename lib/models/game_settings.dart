@@ -45,4 +45,23 @@ class GameSettings {
     if (name == 'Hard') return GameSettings.hard();
     return null;
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'boardWidth': boardWidth,
+      'noOfMines': noOfMines,
+      'settingName': settingName,
+    };
+  }
+
+  factory GameSettings.fromJson(Map<String, dynamic> json) {
+    int boardWidth = json['boardWidth'];
+    int noOfMines = json['noOfMines'];
+    String settingName = json['settingName'];
+    return GameSettings(
+      boardWidth: boardWidth,
+      noOfMines: noOfMines,
+      settingName: settingName,
+    );
+  }
 }

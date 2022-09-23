@@ -17,21 +17,20 @@ class GridButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(gameStateProvider);
-    final gameStateNotifier = ref.watch(gameStateProvider.notifier);
+    final gameController = ref.watch(gameStateProvider.notifier);
 
-    final cellContent = gameState.board.cells[index];
+    final cellContent = gameController.getCell(index);
 
     return GestureDetector(
       onTap: () {
         logger.d('Cell $index tapped');
         HapticFeedback.selectionClick();
-        gameStateNotifier.tapCell(index);
+        gameController.tapCell(index);
       },
       onLongPress: (() {
         logger.d('Cell $index longpressed');
         HapticFeedback.vibrate();
-        gameStateNotifier.longPressCell(index);
+        gameController.longPressCell(index);
       }),
       child: Padding(
         padding: const EdgeInsets.all(1.50),
