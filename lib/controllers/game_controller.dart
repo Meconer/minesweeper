@@ -50,7 +50,8 @@ class GameController extends StateNotifier<GameState> {
   }
 
   void toggleDigOrFlag() {
-    state = state.copyWith(isFlagging: !(state.isFlagging));
+    final newFlagging = !state.isFlagging;
+    state = state.copyWith(isFlagging: newFlagging);
   }
 
   void gameOver() {

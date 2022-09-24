@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -24,6 +26,7 @@ class GamePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameController = ref.watch(gameStateProvider.notifier);
+    final gameState = ref.watch(gameStateProvider);
     logger.d('Rebuild');
 
     return Scaffold(
@@ -44,40 +47,42 @@ class GamePage extends ConsumerWidget {
       body: Column(
         children: [
           Expanded(
-            flex: 3,
-            child: Container(
-              color: Colors.grey[300],
-              child: GameGrid(),
-            ),
+            child: LayoutBuilder(builder: (context, constraints) {
+              final size = min(constraints.maxWidth, constraints.maxHeight);
+              return Container(
+                color: Colors.grey[300],
+                child: GameGrid(size),
+              );
+            }),
           ),
           Container(
             color: Colors.grey[300],
             width: double.infinity,
             alignment: Alignment.center,
+            height: 50,
             child: const WinWidget(),
           ),
-          Expanded(
-            child: Container(
-              color: Colors.grey[300],
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  GameButton(
-                    icon: Icons.refresh,
+          Container(
+            padding: const EdgeInsets.all(30),
+            color: Colors.grey[300],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GameButton(
+                  icon: Icons.refresh,
+                  callback: () {
+                    gameController.initGameBoard(
+                        gameSettings: gameController.getSettings());
+                  },
+                ),
+                GameButton(
+                    icon: gameState.isFlagging
+                        ? Icons.flag_rounded
+                        : Icons.arrow_downward_rounded,
                     callback: () {
-                      gameController.initGameBoard(
-                          gameSettings: gameController.getSettings());
-                    },
-                  ),
-                  GameButton(
-                      icon: gameController.isFlagging()
-                          ? Icons.flag_rounded
-                          : Icons.arrow_downward_rounded,
-                      callback: () {
-                        gameController.toggleDigOrFlag();
-                      }),
-                ],
-              ),
+                      gameController.toggleDigOrFlag();
+                    }),
+              ],
             ),
           )
         ],
