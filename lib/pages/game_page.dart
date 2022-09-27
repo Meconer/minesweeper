@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:minesweeper/services/game_timer.dart';
 import '../controllers/game_controller.dart';
 import '../services/game_saver.dart';
 import '../services/log_to_file.dart';
@@ -31,6 +32,10 @@ class GamePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameStateProvider);
     final gameController = ref.watch(gameStateProvider.notifier);
+    final timerTick = ref.watch(gameTimeProvider);
+
+    double time = timerTick / 10;
+
     logger.d('Rebuild');
     return Scaffold(
       backgroundColor: Colors.grey[300],
@@ -67,6 +72,7 @@ class GamePage extends ConsumerWidget {
             child: const WinWidget(),
           ),
           DifficultySetting(controller: gameController),
+          Text('$time'),
           Container(
             padding: const EdgeInsets.all(30),
             color: Colors.grey[300],
@@ -77,6 +83,9 @@ class GamePage extends ConsumerWidget {
                 GameButton(
                   icon: Icons.refresh,
                   callback: () {
+                    final timerNotifier = ref.read(gameTimeProvider.notifier);
+                    timerNotifier.resetTimer();
+                    timerNotifier.startTimer();
                     gameController.initGameBoard(
                         gameSettings: gameController.getSettings());
                   },
@@ -145,18 +154,24 @@ class WinWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameState = ref.watch(gameStateProvider);
+    final timerTick = ref.watch(gameTimeProvider);
+
+    double time = timerTick / 10;
+
     if (gameState.isWon) {
-      return const Text(
-        'WIN!',
-        style: TextStyle(
+      ref.read(gameTimeProvider.notifier).stopTimer();
+      return Text(
+        'WIN in $time s!',
+        style: const TextStyle(
           color: Colors.green,
           fontSize: 36,
         ),
       );
     } else if (gameState.isGameOver) {
-      return const Text(
-        'BOOM!',
-        style: TextStyle(
+      ref.read(gameTimeProvider.notifier).stopTimer();
+      return Text(
+        'BOOM after $time s!',
+        style: const TextStyle(
             color: Colors.red, fontWeight: FontWeight.bold, fontSize: 36),
       );
     } else {
