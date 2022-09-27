@@ -36,6 +36,7 @@ dependencies:
   flutter_launcher_icons: ^0.10.0
   flutter_riverpod: ^1.0.4
   logger: ^1.1.0
+  material_design_icons_flutter: ^5.0.6996
   path_provider: ^2.0.11
   shared_preferences: ^2.0.15
 

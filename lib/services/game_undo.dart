@@ -1,30 +1,27 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
-import 'package:minesweeper/models/board.dart';
-import 'package:minesweeper/models/game_settings.dart';
 
 import '../models/game_state.dart';
 
 class GameUndo {
-  GameState? undoState;
+  List<GameState> undoStateList = [];
   final logger = Logger(level: Level.debug);
 
   storeState(GameState gameState) {
-    undoState = gameState.copy();
+    undoStateList.add(gameState.copy());
     logger.d('Storing state');
   }
 
-  GameState restoreState() {
+  GameState? restoreState() {
     logger.d('Restoring state');
-    if (undoState != null) return undoState!;
+    if (undoStateList.isNotEmpty) {
+      return undoStateList.removeLast();
+    }
+    return null;
+  }
 
-    return GameState(
-      board: Board.init(GameSettings.easy()),
-      isFlagging: false,
-      isGameOver: false,
-      isWon: false,
-      settings: GameSettings.easy(),
-    );
+  void reset() {
+    undoStateList.clear();
   }
 }
 

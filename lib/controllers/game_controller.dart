@@ -80,6 +80,7 @@ class GameController extends StateNotifier<GameState> {
   }
 
   void initGameBoard({required GameSettings gameSettings}) {
+    undoHandler.reset();
     state = GameState(
       board: Board.init(gameSettings),
       isFlagging: false,
@@ -126,7 +127,8 @@ class GameController extends StateNotifier<GameState> {
   }
 
   void undo() {
-    state = undoHandler.restoreState();
+    final undoState = undoHandler.restoreState();
+    if (undoState != null) state = undoState;
   }
 }
 

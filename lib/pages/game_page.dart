@@ -8,6 +8,7 @@ import '../controllers/game_controller.dart';
 import '../services/game_saver.dart';
 import '../services/log_to_file.dart';
 import '../services/my_log_printer.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../models/game_settings.dart';
 import '../widgets/game_button.dart';
@@ -65,13 +66,14 @@ class GamePage extends ConsumerWidget {
             height: 50,
             child: const WinWidget(),
           ),
+          DifficultySetting(controller: gameController),
           Container(
             padding: const EdgeInsets.all(30),
             color: Colors.grey[300],
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              spacing: 16,
               children: [
-                DifficultySetting(controller: gameController),
                 GameButton(
                   icon: Icons.refresh,
                   callback: () {
@@ -80,12 +82,13 @@ class GamePage extends ConsumerWidget {
                   },
                 ),
                 GameButton(
-                    icon: gameState.isFlagging
-                        ? Icons.flag_rounded
-                        : Icons.arrow_downward_rounded,
-                    callback: () {
-                      gameController.toggleDigOrFlag();
-                    }),
+                  icon: gameController.isFlagging()
+                      ? MdiIcons.flag
+                      : MdiIcons.shovel,
+                  callback: () {
+                    gameController.toggleDigOrFlag();
+                  },
+                ),
                 GameButton(
                     icon: Icons.save_rounded,
                     callback: () {
