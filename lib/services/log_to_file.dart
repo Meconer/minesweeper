@@ -8,7 +8,6 @@ class LogToFile extends LogOutput {
   @override
   Future<void> output(OutputEvent event) async {
     String path = await getLogFilePath();
-    debugPrint(path);
     File logFile = File(path);
     final writer = logFile.openWrite(mode: FileMode.append);
     writer.writeln(DateTime.now().toIso8601String());

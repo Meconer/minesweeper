@@ -1,12 +1,15 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:minesweeper/controllers/game_controller.dart';
-import 'package:minesweeper/services/log_to_file.dart';
-import 'package:minesweeper/services/my_log_printer.dart';
+import '../controllers/game_controller.dart';
+import '../services/game_saver.dart';
+import '../services/log_to_file.dart';
+import '../services/my_log_printer.dart';
 
+import '../models/game_settings.dart';
 import '../widgets/game_button.dart';
 import '../widgets/game_grid.dart';
 import 'settings_page.dart';
@@ -25,10 +28,9 @@ class GamePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameController = ref.watch(gameStateProvider.notifier);
     final gameState = ref.watch(gameStateProvider);
+    final gameController = ref.watch(gameStateProvider.notifier);
     logger.d('Rebuild');
-
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
@@ -36,12 +38,13 @@ class GamePage extends ConsumerWidget {
         backgroundColor: Colors.grey[500],
         foregroundColor: Colors.black87,
         actions: [
-          IconButton(
-            onPressed: (() {
-              Navigator.pushNamed(context, SettingsPage.routeName);
-            }),
-            icon: const Icon(Icons.menu_rounded),
-          )
+          if (kDebugMode)
+            IconButton(
+              onPressed: (() {
+                Navigator.pushNamed(context, SettingsPage.routeName);
+              }),
+              icon: const Icon(Icons.menu_rounded),
+            )
         ],
       ),
       body: Column(
@@ -68,6 +71,7 @@ class GamePage extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                DifficultySetting(controller: gameController),
                 GameButton(
                   icon: Icons.refresh,
                   callback: () {
@@ -82,12 +86,53 @@ class GamePage extends ConsumerWidget {
                     callback: () {
                       gameController.toggleDigOrFlag();
                     }),
+                GameButton(
+                    icon: Icons.save_rounded,
+                    callback: () {
+                      GameSaver().saveGame(gameState);
+                    }),
+                GameButton(
+                  icon: Icons.restore_rounded,
+                  callback: () async {
+                    final restoredState = await GameSaver().restoreGame();
+                    gameController.loadState(restoredState);
+                  },
+                ),
+                GameButton(
+                  icon: Icons.undo_rounded,
+                  callback: () {
+                    gameController.undo();
+                  },
+                )
               ],
             ),
           )
         ],
       ),
     );
+  }
+}
+
+class DifficultySetting extends StatelessWidget {
+  final GameController controller;
+
+  DifficultySetting({super.key, required this.controller});
+  final dropDownMenuItems = GameSettings.standardSettings
+      .map((setting) => DropdownMenuItem<String>(
+            value: setting.settingName,
+            child: Text(setting.settingName),
+          ))
+      .toList();
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+        items: dropDownMenuItems,
+        value: controller.getSettings().settingName,
+        onChanged: (value) {
+          final settings = GameSettings.byName(value)!;
+          controller.changeSettings(settings);
+        });
   }
 }
 

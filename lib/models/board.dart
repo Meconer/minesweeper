@@ -182,13 +182,19 @@ class Board {
   Board copy() {
     List<GameCellContent> newCells = [];
     for (var cell in cells) {
-      newCells.add(cell);
+      var newCell = cell.copy();
+      newCells.add(newCell);
+    }
+
+    List<int> newMines = [];
+    for (var mine in mines) {
+      newMines.add(mine);
     }
 
     Board copiedBoard = Board(
         boardWidth: boardWidth,
         cells: newCells,
-        mines: mines,
+        mines: newMines,
         noOfMines: noOfMines);
     return copiedBoard;
   }

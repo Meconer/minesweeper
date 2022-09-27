@@ -63,4 +63,11 @@ class GameCellContent {
       isFlagged: false,
     );
   }
+
+  GameCellContent copy() {
+    return GameCellContent(
+        gameCellType: gameCellType,
+        noOfNeighbourMines: noOfNeighbourMines,
+        isFlagged: isFlagged);
+  }
 }

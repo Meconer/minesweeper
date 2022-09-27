@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:minesweeper/models/game_settings.dart';
+import 'package:minesweeper/services/game_undo.dart';
 import 'package:minesweeper/services/stored_settings.dart';
 
 import '../models/board.dart';
@@ -11,9 +12,13 @@ class GameController extends StateNotifier<GameState> {
   GameController(super.state);
   Logger logger = Logger(level: Level.error);
 
+  late GameUndo undoHandler;
+
   // User tapped a cell
   void tapCell(int index) {
     logger.d('tapCell called $index');
+    undoHandler.storeState(state);
+
     var board = state.board.copy();
     final dugUpAMine = board.tapCell(index, state.isFlagging);
     if (dugUpAMine) {
@@ -40,6 +45,7 @@ class GameController extends StateNotifier<GameState> {
 
   void longPressCell(int index) {
     logger.d('longPressCell called $index');
+    undoHandler.storeState(state);
     final board = state.board.copy();
 
     board.flagCell(index);
@@ -61,6 +67,8 @@ class GameController extends StateNotifier<GameState> {
       line += '$mine ';
     }
     logger.i(line);
+
+    undoHandler.storeState(state);
 
     state = GameState(
       board: state.board,
@@ -92,6 +100,8 @@ class GameController extends StateNotifier<GameState> {
   Future<void> changeSettings(GameSettings? gameSettings) async {
     logger.d(gameSettings!.settingName);
     await StoredSettings().saveSettings(gameSettings);
+    undoHandler.storeState(state);
+
     var board = state.board;
     if (!board.havePlacedMines()) {
       board = Board.init(gameSettings);
@@ -114,15 +124,23 @@ class GameController extends StateNotifier<GameState> {
   getCell(int index) {
     return state.board.cells[index];
   }
+
+  void undo() {
+    state = undoHandler.restoreState();
+  }
 }
 
 final gameStateProvider =
-    StateNotifierProvider<GameController, GameState>((ref) => GameController(
-          GameState(
-            board: Board.init(GameSettings.easy()),
-            isFlagging: false,
-            isGameOver: false,
-            isWon: false,
-            settings: GameSettings.easy(),
-          ),
-        ));
+    StateNotifierProvider<GameController, GameState>((ref) {
+  final gameController = GameController(
+    GameState(
+      board: Board.init(GameSettings.easy()),
+      isFlagging: false,
+      isGameOver: false,
+      isWon: false,
+      settings: GameSettings.easy(),
+    ),
+  );
+  gameController.undoHandler = ref.read(undoProvider);
+  return gameController;
+});

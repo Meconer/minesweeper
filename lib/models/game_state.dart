@@ -33,6 +33,16 @@ class GameState {
     );
   }
 
+  GameState copy() {
+    Board newBoard = board.copy();
+    return GameState(
+        board: newBoard,
+        isFlagging: isFlagging,
+        isGameOver: isGameOver,
+        isWon: isWon,
+        settings: settings);
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'board': board.toJson(),
