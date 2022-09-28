@@ -7,8 +7,6 @@ import 'package:logger/logger.dart';
 import 'package:minesweeper/services/game_timer.dart';
 import '../controllers/game_controller.dart';
 import '../services/game_saver.dart';
-import '../services/log_to_file.dart';
-import '../services/my_log_printer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../models/game_settings.dart';
@@ -19,9 +17,7 @@ import 'settings_page.dart';
 class GamePage extends ConsumerWidget {
   static const String routeName = '/gamePage';
   final logger = Logger(
-    level: Level.debug,
-    output: LogToFile(),
-    printer: MyLogPrinter(),
+    level: Level.error,
   );
 
   GamePage({
@@ -85,7 +81,6 @@ class GamePage extends ConsumerWidget {
                   callback: () {
                     final timerNotifier = ref.read(gameTimeProvider.notifier);
                     timerNotifier.resetTimer();
-                    timerNotifier.startTimer();
                     gameController.initGameBoard(
                         gameSettings: gameController.getSettings());
                   },

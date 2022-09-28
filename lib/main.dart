@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:minesweeper/pages/splash_screen_page.dart';
-import 'package:minesweeper/services/log_to_file.dart';
-import 'package:minesweeper/services/my_log_printer.dart';
 
 import 'pages/game_page.dart';
 import 'pages/log_file_page.dart';
@@ -17,8 +15,7 @@ main() {
 class MyApp extends StatelessWidget with WidgetsBindingObserver {
   MyApp({super.key});
 
-  final logger =
-      Logger(level: Level.debug, output: LogToFile(), printer: MyLogPrinter());
+  final logger = Logger(level: Level.error);
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {

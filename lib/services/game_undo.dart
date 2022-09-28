@@ -5,7 +5,7 @@ import '../models/game_state.dart';
 
 class GameUndo {
   List<GameState> undoStateList = [];
-  final logger = Logger(level: Level.debug);
+  final logger = Logger(level: Level.error);
 
   storeState(GameState gameState) {
     undoStateList.add(gameState.copy());

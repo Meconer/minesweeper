@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:minesweeper/models/game_settings.dart';
+import 'package:minesweeper/services/game_timer.dart';
 import 'package:minesweeper/services/game_undo.dart';
 import 'package:minesweeper/services/stored_settings.dart';
 
@@ -9,10 +10,11 @@ import '../models/board.dart';
 import '../models/game_state.dart';
 
 class GameController extends StateNotifier<GameState> {
+  late GameTimer gameTimerNotifier;
+  late GameUndo undoHandler;
+
   GameController(super.state);
   Logger logger = Logger(level: Level.error);
-
-  late GameUndo undoHandler;
 
   // User tapped a cell
   void tapCell(int index) {
@@ -20,10 +22,12 @@ class GameController extends StateNotifier<GameState> {
     undoHandler.storeState(state);
 
     var board = state.board.copy();
+    if (!board.havePlacedMines()) gameTimerNotifier.startTimer();
     final dugUpAMine = board.tapCell(index, state.isFlagging);
     if (dugUpAMine) {
       vibrate();
       board.gameOver();
+      gameTimerNotifier.stopTimer();
       final newState = state.copyWith(
         board: board,
         isFlagging: false,
@@ -38,7 +42,10 @@ class GameController extends StateNotifier<GameState> {
         isGameOver: false,
         isWon: board.hasWon(),
       );
-      if (newState.isWon) vibrate();
+      if (newState.isWon) {
+        gameTimerNotifier.stopTimer();
+        vibrate();
+      }
       state = newState;
     }
   }
@@ -69,6 +76,7 @@ class GameController extends StateNotifier<GameState> {
     logger.i(line);
 
     undoHandler.storeState(state);
+    gameTimerNotifier.stopTimer();
 
     state = GameState(
       board: state.board,
@@ -119,6 +127,11 @@ class GameController extends StateNotifier<GameState> {
   }
 
   void loadState(GameState restoredState) {
+    if (!restoredState.isGameOver &&
+        !restoredState.isWon &&
+        restoredState.board.havePlacedMines()) {
+      gameTimerNotifier.startTimer();
+    }
     state = restoredState;
   }
 
@@ -128,7 +141,12 @@ class GameController extends StateNotifier<GameState> {
 
   void undo() {
     final undoState = undoHandler.restoreState();
-    if (undoState != null) state = undoState;
+    if (undoState != null) {
+      if (!undoState.isGameOver && !undoState.isWon) {
+        gameTimerNotifier.startTimer();
+      }
+      state = undoState;
+    }
   }
 }
 
@@ -144,5 +162,6 @@ final gameStateProvider =
     ),
   );
   gameController.undoHandler = ref.read(undoProvider);
+  gameController.gameTimerNotifier = ref.read(gameTimeProvider.notifier);
   return gameController;
 });
