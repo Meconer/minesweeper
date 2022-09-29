@@ -29,14 +29,16 @@ class GameTimer extends StateNotifier<int> with WidgetsBindingObserver {
   bool timerStarted = false;
 
   void startTimer() {
-    timerStarted = true;
-    timer = Timer.periodic(
-      const Duration(milliseconds: 100),
-      (timer) {
-        timerCount++;
-        state = timerCount;
-      },
-    );
+    if (!timerStarted) {
+      timerStarted = true;
+      timer = Timer.periodic(
+        const Duration(milliseconds: 100),
+        (timer) {
+          timerCount++;
+          state = timerCount;
+        },
+      );
+    }
   }
 
   void stopTimer() {

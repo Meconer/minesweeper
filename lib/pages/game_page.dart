@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:minesweeper/controllers/app_controller.dart';
 import 'package:minesweeper/services/game_timer.dart';
 import '../controllers/game_controller.dart';
 import '../services/game_saver.dart';
@@ -29,6 +30,7 @@ class GamePage extends ConsumerWidget {
     final gameState = ref.watch(gameStateProvider);
     final gameController = ref.watch(gameStateProvider.notifier);
     final timerTick = ref.watch(gameTimeProvider);
+    final appController = ref.watch(appControllerProvider);
 
     double time = timerTick / 10;
 
@@ -36,7 +38,7 @@ class GamePage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
-        title: const Text('Minesweeper'),
+        title: Text('Minesweeper ${appController.versionInfo}'),
         backgroundColor: Colors.grey[500],
         foregroundColor: Colors.black87,
         actions: [
