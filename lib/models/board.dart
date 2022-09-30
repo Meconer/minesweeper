@@ -1,21 +1,25 @@
 import 'dart:math';
 import 'package:logger/logger.dart';
 import 'package:minesweeper/models/game_settings.dart';
+import 'package:minesweeper/services/game_solver.dart';
 import 'game_cell_content.dart';
 
 class Board {
   final int boardWidth;
   final int noOfMines;
+  bool generateSolvable;
   late final List<GameCellContent> cells;
   List<int> mines = [];
 
   Logger logger = Logger(level: Level.error);
 
-  Board(
-      {required this.boardWidth,
-      required this.cells,
-      required this.mines,
-      required this.noOfMines}) {
+  Board({
+    required this.boardWidth,
+    required this.cells,
+    required this.mines,
+    required this.noOfMines,
+    required this.generateSolvable,
+  }) {
     logger.d('Board is created.');
     printBoard();
     printMines();
@@ -26,12 +30,14 @@ class Board {
     List<GameCellContent>? cells,
     List<int>? mines,
     int? noOfMines,
+    bool? generateSolvable,
   }) {
     return Board(
       boardWidth: boardWidth ?? this.boardWidth,
       cells: cells ?? this.cells,
       mines: mines ?? this.mines,
       noOfMines: noOfMines ?? this.noOfMines,
+      generateSolvable: generateSolvable ?? this.generateSolvable,
     );
   }
 
@@ -45,6 +51,7 @@ class Board {
       cells: cells,
       mines: <int>[],
       noOfMines: settings.noOfMines,
+      generateSolvable: settings.generateSolvable,
     );
 
     return board;
@@ -147,15 +154,31 @@ class Board {
 
   void placeMinesIfNotDone(int index) {
     if (mines.isEmpty) {
-      // No mines. Place new mines but avoid this cell and all neighbours
-      mines = getRandomMineList(
-        boardWidth * boardWidth,
-        noOfMines,
-        index,
-      );
-      // Set the cellcontent of the mines
+      if (generateSolvable) {
+        bool solvable = false;
+        while (!solvable) {
+          final testBoard = copy();
+          // No mines. Place new mines but avoid this cell and all neighbours
+          testBoard.mines = getRandomMineList(
+            boardWidth * boardWidth,
+            noOfMines,
+            index,
+          );
+          // Set the cellcontent of the mines
+          testBoard.setHiddenMines();
+          // and calculate the cells neighbour mine count
+          testBoard.setNeighbourCounts();
+          solvable = GameSolver(testBoard).solve(index);
+          if (solvable) mines = testBoard.mines;
+        }
+      } else {
+        mines = getRandomMineList(
+          boardWidth * boardWidth,
+          noOfMines,
+          index,
+        );
+      }
       setHiddenMines();
-      // and calculate the cells neighbour mine count
       setNeighbourCounts();
     }
   }
@@ -192,10 +215,12 @@ class Board {
     }
 
     Board copiedBoard = Board(
-        boardWidth: boardWidth,
-        cells: newCells,
-        mines: newMines,
-        noOfMines: noOfMines);
+      boardWidth: boardWidth,
+      cells: newCells,
+      mines: newMines,
+      noOfMines: noOfMines,
+      generateSolvable: generateSolvable,
+    );
     return copiedBoard;
   }
 
@@ -254,12 +279,14 @@ class Board {
       'noOfMines': noOfMines,
       'cells': cells.map((e) => e.toJson()).toList(),
       'mines': mines,
+      'generateSolvable': generateSolvable,
     };
   }
 
   factory Board.fromJson(json) {
     int boardWidth = json['boardWidth'];
     int noOfMines = json['noOfMines'];
+    bool generateSolvable = json['generateSolvable'];
     final jsonCellArray = json['cells'];
     List<GameCellContent> cells = [];
     for (var jsonCell in jsonCellArray) {
@@ -275,6 +302,33 @@ class Board {
       cells: cells,
       mines: mines,
       noOfMines: noOfMines,
+      generateSolvable: generateSolvable,
     );
+  }
+
+  String getBoardString() {
+    String boardStr = ' \n';
+    for (var row = 0; row < boardWidth; row++) {
+      String line = '$row : ';
+      for (var col = 0; col < boardWidth; col++) {
+        int index = getCellIndexFromRowCol(row, col);
+        final cell = cells[index];
+        if (cell.isFlagged) {
+          line += 'f';
+        } else if (cell.gameCellType == GameCellType.empty) {
+          line += '_';
+        } else if (cell.gameCellType == GameCellType.hidden ||
+            cell.gameCellType == GameCellType.hiddenMine) {
+          line += 'O';
+        } else if (cell.gameCellType == GameCellType.mineNeighbour) {
+          line += cell.noOfNeighbourMines.toString();
+        } else if (cell.gameCellType == GameCellType.explodedMine) {
+          line += 'X';
+        }
+      }
+      boardStr += '$line\n';
+    }
+    boardStr += '    --------';
+    return boardStr;
   }
 }

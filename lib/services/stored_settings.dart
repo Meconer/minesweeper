@@ -6,6 +6,7 @@ class StoredSettings {
   static const String boardWithKey = 'BoardWith';
   static const String noOfMinesKey = 'NoOfMines';
   static const String difficultySettingKey = 'diffSetting';
+  static const String generateSolvableKey = 'generateSolvable';
 
   Future<void> saveSettings(GameSettings gameSettings) async {
     final prefs = await SharedPreferences.getInstance();
@@ -21,8 +22,13 @@ class StoredSettings {
     int noOfMines = prefs.getInt(noOfMinesKey) ?? defaultSetting.noOfMines;
     String settingName =
         prefs.getString(difficultySettingKey) ?? defaultSetting.settingName;
+    bool generateSolvable =
+        prefs.getBool(generateSolvableKey) ?? defaultSetting.generateSolvable;
     GameSettings settings = GameSettings(
-        boardWidth: boardWidth, noOfMines: noOfMines, settingName: settingName);
+        boardWidth: boardWidth,
+        noOfMines: noOfMines,
+        settingName: settingName,
+        generateSolvable: generateSolvable);
     return settings;
   }
 }

@@ -70,6 +70,16 @@ class GamePage extends ConsumerWidget {
             child: const WinWidget(),
           ),
           DifficultySetting(controller: gameController),
+          const SizedBox(
+            width: 30,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SolvableSetting(controller: gameController),
+              const Text('Logically solvable boards'),
+            ],
+          ),
           Text('$time'),
           Container(
             padding: const EdgeInsets.all(30),
@@ -142,6 +152,24 @@ class DifficultySetting extends StatelessWidget {
           final settings = GameSettings.byName(value)!;
           controller.changeSettings(settings);
         });
+  }
+}
+
+class SolvableSetting extends StatelessWidget {
+  final GameController controller;
+
+  const SolvableSetting({super.key, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    GameSettings settings = controller.getSettings();
+    return Checkbox(
+      value: settings.generateSolvable,
+      onChanged: (bool? checked) {
+        settings.generateSolvable = checked!;
+        controller.changeSettings(settings);
+      },
+    );
   }
 }
 

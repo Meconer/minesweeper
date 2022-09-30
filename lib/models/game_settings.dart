@@ -2,11 +2,13 @@ class GameSettings {
   int boardWidth;
   int noOfMines;
   String settingName;
+  bool generateSolvable;
 
   GameSettings({
     required this.boardWidth,
     required this.noOfMines,
     required this.settingName,
+    required this.generateSolvable,
   });
 
   factory GameSettings.easy() {
@@ -14,6 +16,7 @@ class GameSettings {
       boardWidth: 8,
       noOfMines: 10,
       settingName: 'Easy',
+      generateSolvable: true,
     );
   }
 
@@ -22,6 +25,7 @@ class GameSettings {
       boardWidth: 12,
       noOfMines: 30,
       settingName: 'Medium',
+      generateSolvable: true,
     );
   }
 
@@ -30,6 +34,7 @@ class GameSettings {
       boardWidth: 16,
       noOfMines: 50,
       settingName: 'Hard',
+      generateSolvable: true,
     );
   }
 
@@ -51,6 +56,7 @@ class GameSettings {
       'boardWidth': boardWidth,
       'noOfMines': noOfMines,
       'settingName': settingName,
+      'generateSolvable': generateSolvable
     };
   }
 
@@ -58,10 +64,12 @@ class GameSettings {
     int boardWidth = json['boardWidth'];
     int noOfMines = json['noOfMines'];
     String settingName = json['settingName'];
+    bool generateSolvable = json['generateSolvable'];
     return GameSettings(
       boardWidth: boardWidth,
       noOfMines: noOfMines,
       settingName: settingName,
+      generateSolvable: generateSolvable,
     );
   }
 }
