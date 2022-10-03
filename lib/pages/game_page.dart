@@ -4,12 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:minesweeper/controllers/app_controller.dart';
-import 'package:minesweeper/services/game_timer.dart';
-import '../controllers/game_controller.dart';
-import '../services/game_saver.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+import '../constants.dart';
+import '../controllers/app_controller.dart';
+import '../services/game_timer.dart';
+import '../controllers/game_controller.dart';
 import '../models/game_settings.dart';
 import '../widgets/game_button.dart';
 import '../widgets/game_grid.dart';
@@ -27,7 +27,7 @@ class GamePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameState = ref.watch(gameStateProvider);
+    ref.watch(gameStateProvider);
     final gameController = ref.watch(gameStateProvider.notifier);
     final timerTick = ref.watch(gameTimeProvider);
     final appController = ref.watch(appControllerProvider);
@@ -36,7 +36,7 @@ class GamePage extends ConsumerWidget {
 
     logger.d('Rebuild');
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: bgColor,
       appBar: AppBar(
         title: Text('Minesweeper ${appController.versionInfo}'),
         backgroundColor: Colors.grey[500],
@@ -55,37 +55,45 @@ class GamePage extends ConsumerWidget {
         children: [
           Expanded(
             child: LayoutBuilder(builder: (context, constraints) {
-              final size = min(constraints.maxWidth, constraints.maxHeight);
+              final size = min(constraints.maxHeight, constraints.maxWidth);
               return Container(
-                color: Colors.grey[300],
+                color: bgColor,
                 child: GameGrid(size),
               );
             }),
           ),
           Container(
-            color: Colors.grey[300],
+            color: bgColor,
             width: double.infinity,
             alignment: Alignment.center,
             height: 50,
             child: const WinWidget(),
           ),
-          DifficultySetting(controller: gameController),
-          const SizedBox(
-            width: 30,
+          Container(
+            color: bgColor,
+            child: Column(
+              children: [
+                DifficultySetting(controller: gameController),
+                const SizedBox(
+                  width: 30,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SolvableSetting(controller: gameController),
+                    const Text('Logically solvable boards'),
+                  ],
+                ),
+                Text('$time'),
+              ],
+            ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SolvableSetting(controller: gameController),
-              const Text('Logically solvable boards'),
-            ],
-          ),
-          Text('$time'),
           Container(
             padding: const EdgeInsets.all(30),
-            color: Colors.grey[300],
+            color: bgColor,
+            width: double.infinity,
             child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
+              alignment: WrapAlignment.center,
               spacing: 16,
               children: [
                 GameButton(
@@ -105,18 +113,18 @@ class GamePage extends ConsumerWidget {
                     gameController.toggleDigOrFlag();
                   },
                 ),
-                GameButton(
-                    icon: Icons.save_rounded,
-                    callback: () {
-                      GameSaver().saveGame(gameState);
-                    }),
-                GameButton(
-                  icon: Icons.restore_rounded,
-                  callback: () async {
-                    final restoredState = await GameSaver().restoreGame();
-                    gameController.loadState(restoredState);
-                  },
-                ),
+                // GameButton(
+                //     icon: Icons.save_rounded,
+                //     callback: () {
+                //       GameSaver().saveGame(gameState);
+                //     }),
+                // GameButton(
+                //   icon: Icons.restore_rounded,
+                //   callback: () async {
+                //     final restoredState = await GameSaver().restoreGame();
+                //     gameController.loadState(restoredState);
+                //   },
+                // ),
                 GameButton(
                   icon: Icons.undo_rounded,
                   callback: () {
@@ -203,7 +211,6 @@ class WinWidget extends ConsumerWidget {
       return const Text(
         'Playing',
         style: TextStyle(
-          backgroundColor: Colors.transparent,
           fontSize: 36,
         ),
       );

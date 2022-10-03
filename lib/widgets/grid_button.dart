@@ -9,9 +9,11 @@ import '../controllers/game_controller.dart';
 class GridButton extends ConsumerWidget {
   final int index;
   final Logger logger = Logger(level: Level.error);
+  final double cellSize;
 
   GridButton(
-    this.index, {
+    this.index,
+    this.cellSize, {
     Key? key,
   }) : super(key: key);
 
@@ -20,6 +22,8 @@ class GridButton extends ConsumerWidget {
     final gameController = ref.watch(gameStateProvider.notifier);
 
     final cellContent = gameController.getCell(index);
+    final size = cellSize - 3;
+    final fontSize = size / 1.3;
 
     return GestureDetector(
       onTap: () {
@@ -39,7 +43,7 @@ class GridButton extends ConsumerWidget {
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(1.5),
-              child: getCellArt(cellContent, index),
+              child: getCellArt(cellContent, index, fontSize),
             ),
           ),
         ),
@@ -62,14 +66,15 @@ class GridButton extends ConsumerWidget {
           ]);
   }
 
-  Widget getCellArt(GameCellContent cellContent, int cellIndex) {
+  Widget getCellArt(GameCellContent cellContent, int cellIndex, double size) {
     switch (cellContent.gameCellType) {
       case GameCellType.hidden:
       case GameCellType.hiddenMine:
         return cellContent.isFlagged
-            ? const Icon(
+            ? Icon(
                 Icons.flag_outlined,
                 color: Colors.orange,
+                size: size,
               )
             : const Text(' ');
 
@@ -85,7 +90,7 @@ class GridButton extends ConsumerWidget {
           style: TextStyle(
             color: getNumberColor(cellContent.noOfNeighbourMines),
             fontWeight: FontWeight.w900,
-            fontSize: 18,
+            fontSize: size,
           ),
         );
     }
