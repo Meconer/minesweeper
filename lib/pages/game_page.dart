@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:url_launcher/link.dart';
 
 import '../constants.dart';
 import '../controllers/app_controller.dart';
@@ -38,10 +39,30 @@ class GamePage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        title: Text('Minesweeper ${appController.versionInfo}'),
+        title: const Text('Minesweeper'),
         backgroundColor: Colors.grey[500],
         foregroundColor: Colors.black87,
         actions: [
+          IconButton(
+            onPressed: (() {
+              showAboutDialog(
+                context: context,
+                //applicationIcon: Image.asset('assets/images/bomb_C01.png')),
+                applicationName: appController.appName,
+                applicationVersion: appController.versionInfo,
+                children: [
+                  Link(
+                    target: LinkTarget.blank,
+                    uri: Uri.parse('https://matc.se/minesweeper/policy.html'),
+                    builder: ((context, followLink) => ElevatedButton(
+                        onPressed: followLink,
+                        child: const Text('Privacy policy'))),
+                  ),
+                ],
+              );
+            }),
+            icon: const Icon(Icons.help),
+          ),
           if (kDebugMode)
             IconButton(
               onPressed: (() {

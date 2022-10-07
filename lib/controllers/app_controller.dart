@@ -8,10 +8,13 @@ class AppController {
   final GameController gameController;
   AppController(this.gameController);
   late String versionInfo;
+  late String appName;
 
   Future<void> initApp() async {
     final packageInfo = await PackageInfo.fromPlatform();
-    versionInfo = 'ver: ${packageInfo.version}';
+    appName = packageInfo.appName;
+    versionInfo =
+        'ver: ${packageInfo.version} build: ${packageInfo.buildNumber}';
     GameSettings settings = await StoredSettings().loadSettings();
     gameController.changeSettings(settings);
   }
