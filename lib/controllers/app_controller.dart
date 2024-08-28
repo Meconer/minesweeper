@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:minesweeper/constants.dart';
 import 'package:minesweeper/controllers/game_controller.dart';
 import 'package:minesweeper/models/game_settings.dart';
 import 'package:minesweeper/services/stored_settings.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class AppController {
   final GameController gameController;
@@ -11,10 +11,8 @@ class AppController {
   late String appName;
 
   Future<void> initApp() async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    appName = packageInfo.appName;
-    versionInfo =
-        'ver: ${packageInfo.version} build: ${packageInfo.buildNumber}';
+    appName = appCName;
+    versionInfo = 'ver: $appVersion build: $appBuildNo';
     GameSettings settings = await StoredSettings().loadSettings();
     gameController.changeSettings(settings);
   }
